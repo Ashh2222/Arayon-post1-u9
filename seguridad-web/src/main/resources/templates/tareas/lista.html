@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Mis tareas</title>
+</head>
+<body>
+  <h1>Mis tareas</h1>
+
+  <h2>Nueva tarea</h2>
+  <form th:action="@{/tareas}" th:object="${tarea}" method="post">
+    <p>
+      <label>Título: <input type="text" th:field="*{titulo}"></label>
+      <span th:if="${#fields.hasErrors('titulo')}" th:errors="*{titulo}" style="color:red"></span>
+    </p>
+    <p>
+      <label>Descripción: <input type="text" th:field="*{descripcion}"></label>
+      <span th:if="${#fields.hasErrors('descripcion')}" th:errors="*{descripcion}" style="color:red"></span>
+    </p>
+    <button type="submit">Crear</button>
+  </form>
+
+  <h2>Buscar por título</h2>
+  <form th:action="@{/tareas/buscar}" method="get">
+    <input type="text" name="texto" th:value="${texto}">
+    <button type="submit">Buscar</button>
+    <a th:href="@{/tareas}">Limpiar</a>
+  </form>
+
+  <h2>Resultados</h2>
+  <p th:if="${#lists.isEmpty(tareas)}">No hay tareas.</p>
+  <table border="1" th:unless="${#lists.isEmpty(tareas)}">
+    <tr><th>ID</th><th>Título</th><th>Descripción</th><th>Completada</th></tr>
+    <tr th:each="t : ${tareas}">
+      <td th:text="${t.id}"></td>
+      <td th:text="${t.titulo}"></td>
+      <td th:text="${t.descripcion}"></td>
+      <td th:text="${t.completada}"></td>
+    </tr>
+  </table>
+
+  <p><a th:href="@{/dashboard}">Volver al dashboard</a></p>
+</body>
+</html>
