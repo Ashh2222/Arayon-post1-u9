@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard</title>
+</head>
+<body>
+  <h1>Dashboard</h1>
+
+  <!-- th:text escapa el contenido: un nombre con <script> se muestra
+       como texto, no se ejecuta. -->
+  <p>Bienvenido, <span th:text="${nombre}"></span></p>
+  <p>Roles: <span th:text="${roles}"></span></p>
+
+  <a th:href="@{/tareas}">Mis tareas</a>
+  <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin}">Panel de Administración</a>
+
+  <form th:action="@{/logout}" method="post">
+    <button type="submit">Cerrar Sesión</button>
+  </form>
+</body>
+</html>
