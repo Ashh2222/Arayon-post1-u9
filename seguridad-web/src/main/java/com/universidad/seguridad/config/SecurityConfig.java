@@ -12,7 +12,12 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-
+import com.universidad.seguridad.security.JwtAuthFilter;
+import com.universidad.seguridad.security.JwtUtil;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import com.universidad.seguridad.security.UsuarioDetailsService;
 
 @Configuration
@@ -72,4 +77,25 @@ public class SecurityConfig {
         // Thymeleaf con cookie de sesion, el escenario que CSRF protege.
         return http.build();
     }
+    // Cadena stateless para la API. @Order(1): se evalua ANTES que la web.
+@Bean
+@Order(1)
+public SecurityFilterChain apiFilterChain(HttpSecurity http, JwtUtil jwtUtil)
+        throws Exception {
+    JwtAuthFilter jwtAuthFilter = new JwtAuthFilter(jwtUtil);
+    http
+        .securityMatcher("/api/**")
+        // CSRF off SOLO aqui: no hay cookie de sesion, el token va en header.
+        .csrf(csrf -> csrf.disable())
+        .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .exceptionHandling(e -> e.authenticationEntryPoint(
+            new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/api/auth/login").permitAll()
+            .requestMatchers("/api/admin/**").hasRole("ADMIN")
+            .anyRequest().authenticated()
+        )
+        .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+    return http.build();
+}
 }
