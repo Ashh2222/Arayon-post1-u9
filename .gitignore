@@ -1,0 +1,13 @@
+# IDEs
+.idea/
+*.iml
+.vscode/
+
+# Compilados
+target/
+
+# Secretos locales
+.env
+
+# Otros
+HELP.md
