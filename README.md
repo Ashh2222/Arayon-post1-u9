@@ -13,9 +13,18 @@ bajo `/api/**`.
 `BCryptPasswordEncoder(12)` y autorización por rol (`HttpSecurity` y `@PreAuthorize`).
 CSRF queda activo porque esta cadena depende de cookie de sesión.
 
-### Login y roles
+### Registro, login y roles
+![Registro exitoso](capturas/registro-exitoso.png)
+Registro de un usuario nuevo: redirige a `/login` con mensaje de éxito.
+
 ![Login](capturas/login.png)
 Acceder a `/dashboard` sin sesión redirige a `/login`.
+
+![Dashboard de usuario](capturas/dashboard-usuario.png)
+Dashboard de un usuario con rol USER.
+
+![Lista de tareas](capturas/tareas-lista.png)
+Tareas del usuario autenticado (solo las propias).
 
 ![Hash BCrypt en MySQL](capturas/bcrypt-mysql.png)
 Las contraseñas se guardan como hash (`$2a$12$...`), nunca en texto claro.
@@ -81,8 +90,11 @@ Firma modificada: 401.
 ![Token expirado](capturas/jwt-expirado.png)
 Con `jwt.expiracion-ms=5000`: primero 200 y, pasados 6 segundos, 401.
 
-![Rol insuficiente](capturas/jwt-rol-403.png)
-Token USER en `/api/admin/usuarios`: 403; token ADMIN: 200.
+![Rol insuficiente](capturas/jwt-user-403.png)
+Token USER en `/api/admin/usuarios`: 403.
+
+![Rol suficiente](capturas/jwt-admin-200.png)
+Token ADMIN en `/api/admin/usuarios`: 200.
 
 ### Coexistencia sesión + JWT
 ![Coexistencia](capturas/coexistencia.png)
@@ -115,7 +127,7 @@ Ajustes respecto al material base, con su motivo:
 **API JWT**
 - `JwtAuthFilter` sin `@Component` e instanciado dentro de `apiFilterChain`, para que no se registre también como filtro global.
 - `HttpStatusEntryPoint(UNAUTHORIZED)`: sin él, la API respondería 403 en lugar de 401.
-- Login JWT captura `AuthenticationException` y responde 401.
+- El login JWT captura `AuthenticationException` y responde 401.
 - DTO (`TareaDto`, `UsuarioDto`): evitan serializar el hash de contraseña.
 - `ApiAdminController` (`/api/admin/usuarios`) para probar el 403 por rol.
 
